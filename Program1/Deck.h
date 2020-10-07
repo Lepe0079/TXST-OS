@@ -12,7 +12,6 @@ class Deck
         static const int DECKSIZE = 52; 
         int currentCards = 0;
         int seed; 
-        //Card *pack[DECKSIZE];
         std::deque<Card*> cDeck;
         char suits[4] = {'C', 'D', 'H', 'S'};
 
