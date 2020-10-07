@@ -1,14 +1,20 @@
 #include "Player.h"
 
+//initiate static variable
+int Player::randSeed;
 
+//default constructor
 Player::Player():playerID(1)
 {
+    randSeed = 1;
     initLocks();
     changeSeed(1);
 }
     
+//actual constructor. 
 Player::Player(int ID, int newSeed, Deck* deckRef)
 {
+    randSeed = newSeed;
     initLocks();
     if(ID <=0)
         playerID = 1;
@@ -31,11 +37,16 @@ void Player::playerDraw()
     }
     else
     {
-        gamelog("cannot draw anymore cards");
+        gameLog("cannot draw anymore cards");
     }
     pthread_mutex_unlock(&drawLock);
 }
 
+//function to start player thread
+void Player::threadEntry(bool* win){
+
+}
+//player discards a card at random
 void Player::playerDiscard(){
     pthread_mutex_lock(&discardLock);
     srand(randSeed);
@@ -55,6 +66,7 @@ void Player::playerDiscard(){
     pthread_mutex_unlock(&discardLock);
 }
 
+//check if player has won
 bool Player::playerWin()
 {
     pthread_mutex_lock(&winLock);
@@ -66,6 +78,7 @@ bool Player::playerWin()
     return isWinner;
 }
 
+//the function to run a thread of player 
 void* Player::playerTurn(void* win)
 {
     bool winnerFound = (bool)win;
@@ -96,22 +109,23 @@ void Player::resetWin(){isWinner = false;}
 
 void Player::changeSeed(int newSeed){randSeed = newSeed;}
 
+//initiate mutex locks
 void Player::initLocks()
 {
     if(pthread_mutex_init(&drawLock, NULL) != 0){
-        gamelog("could not Initiate Draw Lock");
+        gameLog("could not Initiate Draw Lock");
         EXIT_FAILURE;
     }
     if(pthread_mutex_init(&winLock, NULL) != 0){
-        gamelog("could not Initiate Win Lock");
+        gameLog("could not Initiate Win Lock");
         EXIT_FAILURE;
     }
     if(pthread_mutex_init(&discardLock, NULL) != 0){
-        gamelog("could not Initiate Win Lock");
+        gameLog("could not Initiate Win Lock");
         EXIT_FAILURE;
     }
     if(pthread_mutex_init(&turnLock, NULL) != 0){
-        gamelog("could not Initiate Win Lock");
+        gameLog("could not Initiate Win Lock");
         EXIT_FAILURE;
     }
 }
