@@ -1,0 +1,5 @@
+Name: Xiao Chen 
+Education: BS, MS, computer science, Shanghai University; PhD, computer engineering, Florida Atlantic University
+Research Interests: Ad hoc wireless networks, sensor networks, distributed systems
+Office: CMAL 311A
+Webpage: http://www.cs.txstate.edu/~xc10
