@@ -8,12 +8,10 @@ def logger(s):
 from urllib.request import urlopen
 import re
 
-url = "https://faculty.txstate.edu/profile/1921720"
+url = "https://cs.txstate.edu/accounts/profiles/jg66/"
 page = urlopen(url)
 
 html_bytes = page.read()
 html = html_bytes.decode("utf-8")
 
-clean = re.sub('<.*?>', '',html)
-
-print(clean)
+logger(html)
