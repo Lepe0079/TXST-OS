@@ -1,4 +1,4 @@
-pwar: main.o Deck.o
+pwar: main.o Deck.o Player.o gameLog.o
 	g++ main.o Deck.o Player.o gameLog.o -o pwar -lpthread
 
 main.o: main.cpp

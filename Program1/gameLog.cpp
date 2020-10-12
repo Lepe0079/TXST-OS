@@ -1,9 +1,6 @@
-#include<fstream>
-#include<iostream>
+#include "gameLog.h"
 
-using namespace std;
-
-void gamelog(string s)
+void gameLog(string s)
 {
     cout << s << endl;
     ofstream fileOUT;
