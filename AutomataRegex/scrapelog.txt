@@ -1,5 +1,0 @@
-Name: Byron Gao 
-Education: BS, PhD, Simon Fraser University
-Research Interests: Data mining, databases, information retrieval
-Office: CMAL 311D
-Webpage: http://cs.txstate.edu/~jg66

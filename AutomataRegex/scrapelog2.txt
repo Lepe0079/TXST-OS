@@ -1,5 +1,0 @@
-Name: Moonis Ali 
-Education: BSc, MSc, PhD, Aligarh University
-Research Interests: Artificial intelligence, knowledge-based expert systems, intelligent databases and interfaces, intelligent diagnostic systems, natural language processing, neural networks, Computer Science Education
-Office: CMAL 301B
-Webpage: http://www.cs.txstate.edu/~ma04
