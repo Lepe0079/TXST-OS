@@ -82,10 +82,11 @@ bool Player::playerWin()
 void* Player::playerTurn(void* win)
 {
     bool winnerFound = (bool)win;
+    Player p;
     pthread_mutex_lock(&turnLock);
     if(!winnerFound)
     {
-        playerDraw();
+        this.playerDraw();
         playerWin();
         playerDiscard();
     }
