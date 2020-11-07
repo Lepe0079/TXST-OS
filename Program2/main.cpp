@@ -21,28 +21,30 @@ struct event{
 
 ////////////////////////////////////////////////////////////////
 // function definition
-void init();
+void init(int);
 int run_sim();
 void generate_report();
 int schedule_event(struct event* node);
 int process_event1(struct event* eve);
 int process_event2(struct event* eve);
+int process_event3(struct event* eve);
 float genexp(float);
 
 ////////////////////////////////////////////////////////////////
 //Global variables
 struct event* head; // head of event queue
-float Eclock; // simulation Eclock
+float sClock; // simulation Eclock
 
 ////////////////////////////////////////////////////////////////
-void init()
+void init(int eType)
 {
 	// initialize all varilables, states, and end conditions
 	// schedule first events
 
 	head = new event;
-	Eclock = 0.0;
-	for(int i = 0; i < )
+	head->time = genexp(1/.06);
+	head->type = eType;
+	sClock = 0.0;
 
 }
 ////////////////////////////////////////////////////////////////
@@ -76,15 +78,16 @@ float genexp(float lambda)
 int run_sim()
 {
 	struct event* eve;
+	struct event* garbageE;
 	int i = 0;
-	while (i < 1)
+	while (i < 5)//run for 10k events
 	{
 		eve = head;
-		Eclock += eve->time;
+		sClock = eve->time;//increment the clock
 		switch (eve->type)
 		{
 			case EVENT1:
-			process_event1(eve);
+			process_event1(eve);//generate the next event
 			break;
 			case EVENT2:
 			process_event2(eve);
@@ -98,14 +101,12 @@ int run_sim()
 			break;	
 			// error 
 		}
-
+		garbageE = head;
 		head = eve->next;
-		//free(eve);
-		//eve = nullptr;
-		//delete eve;
-		//eve = NULL;
+		delete garbageE;
 		++i;
 	}
+	garbageE = nullptr;
 	return 0;
 }
 
@@ -124,7 +125,8 @@ int main(int argc, char *argv[] )
 	int lambdaVal = atoi(argv[2]);//processes per second
 	float avBurst = atof(argv[3]);
 	float quantum = atof(argv[4]);
-	init();
+
+	init(scheduling);
 	run_sim();
 	generate_report();
 	return 0;
