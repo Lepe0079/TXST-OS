@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <iostream>
 
 ////////////////////////////////////////////////////////////////
 // sample events
 #define EVENT1 1
 #define EVENT2 2
+#define EVENT3 3
 // .. add more events
 
 ////////////////////////////////////////////////////////////////     
@@ -22,20 +24,26 @@ struct event{
 void init();
 int run_sim();
 void generate_report();
-int schedule_event(struct event*);
+int schedule_event(struct event* node);
 int process_event1(struct event* eve);
 int process_event2(struct event* eve);
+float genexp(float);
 
 ////////////////////////////////////////////////////////////////
 //Global variables
 struct event* head; // head of event queue
-float clock; // simulation clock
+float Eclock; // simulation Eclock
 
 ////////////////////////////////////////////////////////////////
 void init()
 {
 	// initialize all varilables, states, and end conditions
 	// schedule first events
+
+	head = new event;
+	Eclock = 0.0;
+	for(int i = 0; i < )
+
 }
 ////////////////////////////////////////////////////////////////
 void generate_report()
@@ -44,7 +52,7 @@ void generate_report()
 }
 //////////////////////////////////////////////////////////////// 
 //schedules an event in the future
-int schedule_event(struct event* new)
+int schedule_event(struct event* node)
 {
 	// insert event in the event queue in its order of time
 }
@@ -67,35 +75,42 @@ float genexp(float lambda)
 ////////////////////////////////////////////////////////////
 int run_sim()
 {
-  struct event* eve;
-  while (!end_condition)
-    {
-      eve = head;
-      clock = eve->time;
-      switch (eve->type)
+	struct event* eve;
+	int i = 0;
+	while (i < 1)
 	{
-		case EVENT1:
+		eve = head;
+		Eclock += eve->time;
+		switch (eve->type)
+		{
+			case EVENT1:
 			process_event1(eve);
 			break;
-		case EVENT2:
+			case EVENT2:
 			process_event2(eve);
 			break;
+			case EVENT3:
+			break;
 
-		// add more events
+			// add more events
 
-		default:	
+			default:
+			break;	
 			// error 
-	}
+		}
 
-      head = eve->next;
-      free(eve);
-      eve = NULL;
-    }
-  return 0;
+		head = eve->next;
+		//free(eve);
+		//eve = nullptr;
+		//delete eve;
+		//eve = NULL;
+		++i;
+	}
+	return 0;
 }
 
 int process_event1(event* eve){
-
+	std::cout << "processing event";
 }
 
 int process_event2(event* eve){
@@ -104,9 +119,13 @@ int process_event2(event* eve){
 ////////////////////////////////////////////////////////////////
 int main(int argc, char *argv[] )
 {
-  // parse arguments
-  init();
-  run_sim(); 
-  generate_report();
-  return 0;
+	// parse arguments
+	int scheduling = atoi(argv[1]);
+	int lambdaVal = atoi(argv[2]);//processes per second
+	float avBurst = atof(argv[3]);
+	float quantum = atof(argv[4]);
+	init();
+	run_sim();
+	generate_report();
+	return 0;
 }
