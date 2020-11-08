@@ -211,3 +211,25 @@ int main(int argc, char *argv[] )
 	generate_report();
 	return 0;
 }
+
+
+/*average turnaround = (completion Time - arrival Time) / processes. where completion time is 
+the current clock time(burst time += burst time)
+
+total throughput = (burst+=burst)/ processes
+
+CPU Utilization = u = required(busy time)/capacity(busy+idle)
+		burst time total/burst time total + context switches(switching between processes)
+
+average number of processes in ready queue n = lambda*average waiting time(0 + burst1... += burst n-1)/processes
+
+event queue holds the events that will be handled by the simulation
+ready queue holds the events that are generated to be added to the event queue
+
+for fcfs ready queue will just insert into event queue by order of arrival
+
+basically ready queue is just the array that holds the generated values
+
+be sure to fulfill this requirement
+Running the simulator with no arguments should display the arguments
+usage.*/
