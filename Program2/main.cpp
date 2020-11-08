@@ -30,8 +30,10 @@ struct event{
 void init();
 int run_sim();
 void generate_report();
+int addReady();
 int schedule_event(struct event** node);
-int process_event1(struct event* eve);
+int scheduleFCFS();
+int process_event1();
 int process_event2(struct event* eve);
 int process_event3(struct event* eve);
 float genexp(float);
@@ -39,6 +41,8 @@ float genexp(float);
 ////////////////////////////////////////////////////////////////
 //Global variables
 struct event* head; // head of event queue
+struct event* ready; //head of ready queue
+struct event* garbage; //garbage collector
 float sClock; // simulation Eclock
 char **argv; //used to extract arguments from main and use them globally
 int processed, processLimit;
@@ -50,14 +54,10 @@ void init()
 	processed = 0;
 	processLimit = 10;
 
-	// schedule first events
-	head = new event;
-	head->burst = genexp(1/ARBURST);
-	head->type = ARTYPE;
-	head->arrival = 0;
-
-	for(int i = 1; i < processLimit; ++i)
-		schedule_event(&head);
+	for(int i = 0; i < processLimit; ++i)
+	{	
+		addReady();
+	}
 
 	sClock = 0.0;
 }
@@ -66,22 +66,27 @@ void generate_report()
 {
 	// output statistics
 }
-//////////////////////////////////////////////////////////////// 
-//schedules an event in the future
-int schedule_event(struct event** node)
+
+
+//add an event to the ready queue
+int addReady()
 {
-	// insert event in the event queue in its order of arrival
-	struct event* cursor = (*node);
+	struct event* cursor = ready;
 	struct event* backC;
 	struct event* newProc = new event;
 
 	newProc->type = ARTYPE;
 	newProc->burst = genexp(1/ARBURST);
 	newProc->arrival = genexp(ARLAMBDA);
+	if(!ready)
+	{
+		ready = newProc;
+		return 0;
+	}
 	if(cursor->arrival > newProc->arrival)
 	{
-		newProc->next = (*node);
-		(*node) = newProc;
+		newProc->next = ready;
+		ready = newProc;
 	}
 	else
 	{
@@ -91,6 +96,54 @@ int schedule_event(struct event** node)
 		newProc->next = cursor->next;
 		cursor->next = newProc;
 	}
+	return 0;
+}
+//////////////////////////////////////////////////////////////// 
+//schedules an event in the future
+int schedule_event(struct event** node)
+{
+	// insert event in the event queue in its order of burst
+	return 0;
+}
+
+int scheduleFCFS()
+{//remember ready queue is sorted by arrival time
+	struct event* cursor;
+	struct event* temp;
+
+	if(!ready)//make sure there is something in the ready queue
+	{
+		addReady();
+	}
+	
+	cursor = head;
+	temp = ready;
+
+	if(!head)//if there is nothing at the event queue add the ready object to the head
+	{
+		ready = ready->next;
+		head = temp;
+		return 0;
+	}
+	else
+	{//otherwise insert by arrival time
+		if(cursor->arrival > temp->arrival)
+		{//insert before head
+			ready = ready->next;
+			temp->next = head;
+			head = temp;
+		}
+		else
+		{//search for insert point
+			while(cursor->next && cursor->next->arrival < temp->arrival){
+				cursor = cursor->next;
+			}
+			ready = ready->next;
+			temp->next = cursor->next;
+			cursor->next = temp;
+		}
+	}
+	return 0;
 }
 ////////////////////////////////////////////////////////////////
 // returns a random number between 0 and 1
@@ -111,45 +164,34 @@ float genexp(float lambda)
 ////////////////////////////////////////////////////////////
 int run_sim()
 {
-	struct event* eve;
-	struct event* garbage;
 	while (processed < processLimit)//run for 10k events
 	{
-		eve = head;
-		sClock = eve->arrival;//increment the clock
-		std::cout << "start" << std::endl;
-		switch (eve->type)
+		switch (ARTYPE)
 		{
 			case EVENT1:
-			process_event1(eve);//generate the next event
-			break;
+				process_event1();//generate the next event
+				scheduleFCFS();
+				break;
 			case EVENT2:
-			process_event2(eve);
-			break;
+				//process_event2();
+				break;
 			case EVENT3:
-			break;
+				break;
 
 			// add more events
 
 			default:
-			break;	
+				break;	
 			// error 
 		}
-		garbage = head;//set to the current node to be destroyed
-		head = eve->next;
-
-		delete garbage;//destroy the old data
-
 		++processed;
 	}
-	std::cout << "clock: " << sClock;
 	return 0;
 }
 
-int process_event1(event* eve){
-	std::cout << processed+1 << ": " << eve->burst << std::endl;
-	
-
+int process_event1(){	
+	std::cout << processed+1 << ": " << head->burst << std::endl;
+	head = head->next;
 }
 
 int process_event2(event* eve){
