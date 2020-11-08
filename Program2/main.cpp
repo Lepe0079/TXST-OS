@@ -18,7 +18,7 @@
 ////////////////////////////////////////////////////////////////     
 //event structure
 struct event{
-  float time;//burst
+  float burst;//burst
   float arrival;
   int   type;
   // add more fields
@@ -52,7 +52,7 @@ void init()
 
 	// schedule first events
 	head = new event;
-	head->time = genexp(1/ARBURST);
+	head->burst = genexp(1/ARBURST);
 	head->type = ARTYPE;
 	head->arrival = 0;
 
@@ -70,35 +70,26 @@ void generate_report()
 //schedules an event in the future
 int schedule_event(struct event** node)
 {
-	// insert event in the event queue in its order of time
+	// insert event in the event queue in its order of arrival
 	struct event* cursor = (*node);
 	struct event* backC;
 	struct event* newProc = new event;
 
 	newProc->type = ARTYPE;
-	newProc->time = genexp(1/ARBURST);
+	newProc->burst = genexp(1/ARBURST);
 	newProc->arrival = genexp(ARLAMBDA);
-	switch (ARTYPE)
+	if(cursor->arrival > newProc->arrival)
 	{
-	case 1://FCFS, creates a list of processes sorted by arrival time
-		if(cursor->arrival > newProc->arrival)
-		{
-
-			newProc->next = (*node);
-			(*node) = newProc;
+		newProc->next = (*node);
+		(*node) = newProc;
+	}
+	else
+	{
+		while(cursor->next && cursor->next->arrival < newProc->arrival){
+			cursor = cursor->next;
 		}
-		else
-		{
-			while(cursor->next && cursor->next->arrival < newProc->arrival){
-				cursor = cursor->next;
-			}
-			newProc->next = cursor->next;
-			cursor->next = newProc;
-		}
-		break;
-	
-	default:
-		break;
+		newProc->next = cursor->next;
+		cursor->next = newProc;
 	}
 }
 ////////////////////////////////////////////////////////////////
@@ -125,7 +116,7 @@ int run_sim()
 	while (processed < processLimit)//run for 10k events
 	{
 		eve = head;
-		sClock = eve->time;//increment the clock
+		sClock = eve->arrival;//increment the clock
 		std::cout << "start" << std::endl;
 		switch (eve->type)
 		{
@@ -151,11 +142,13 @@ int run_sim()
 
 		++processed;
 	}
+	std::cout << "clock: " << sClock;
 	return 0;
 }
 
 int process_event1(event* eve){
-	std::cout << processed+1 << ": " << eve->time << std::endl;
+	std::cout << processed+1 << ": " << eve->burst << std::endl;
+	
 
 }
 
