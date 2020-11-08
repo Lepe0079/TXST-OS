@@ -30,7 +30,7 @@ struct event{
 void init();
 int run_sim();
 void generate_report();
-int schedule_event(struct event* node);
+int schedule_event(struct event** node);
 int process_event1(struct event* eve);
 int process_event2(struct event* eve);
 int process_event3(struct event* eve);
@@ -48,13 +48,16 @@ void init()
 {
 	// initialize all varilables, states, and end conditions
 	processed = 0;
-	processLimit = 1;
+	processLimit = 10;
 
 	// schedule first events
 	head = new event;
 	head->time = genexp(1/ARBURST);
 	head->type = ARTYPE;
 	head->arrival = 0;
+
+	for(int i = 1; i < processLimit; ++i)
+		schedule_event(&head);
 
 	sClock = 0.0;
 }
@@ -65,29 +68,32 @@ void generate_report()
 }
 //////////////////////////////////////////////////////////////// 
 //schedules an event in the future
-int schedule_event(struct event* node)
+int schedule_event(struct event** node)
 {
 	// insert event in the event queue in its order of time
-	struct event* cursor = node;
+	struct event* cursor = (*node);
+	struct event* backC;
 	struct event* newProc = new event;
 
 	newProc->type = ARTYPE;
 	newProc->time = genexp(1/ARBURST);
 	newProc->arrival = genexp(ARLAMBDA);
-	switch (node->type)
+	switch (ARTYPE)
 	{
 	case 1://FCFS, creates a list of processes sorted by arrival time
-		if(cursor->time > newProc->time)
+		if(cursor->arrival > newProc->arrival)
 		{
-			newProc->next = cursor;
-			node = newProc;
+
+			newProc->next = (*node);
+			(*node) = newProc;
 		}
 		else
 		{
-			if(cursor->next)
-			{
-				
+			while(cursor->next && cursor->next->arrival < newProc->arrival){
+				cursor = cursor->next;
 			}
+			newProc->next = cursor->next;
+			cursor->next = newProc;
 		}
 		break;
 	
@@ -115,11 +121,12 @@ float genexp(float lambda)
 int run_sim()
 {
 	struct event* eve;
-	struct event* garbageE;
+	struct event* garbage;
 	while (processed < processLimit)//run for 10k events
 	{
 		eve = head;
 		sClock = eve->time;//increment the clock
+		std::cout << "start" << std::endl;
 		switch (eve->type)
 		{
 			case EVENT1:
@@ -137,22 +144,22 @@ int run_sim()
 			break;	
 			// error 
 		}
-		garbageE = head;
+		garbage = head;//set to the current node to be destroyed
 		head = eve->next;
-		delete garbageE;
+
+		delete garbage;//destroy the old data
+
 		++processed;
 	}
-	garbageE = nullptr;
 	return 0;
 }
 
 int process_event1(event* eve){
-	std::cout << "processing event";
+	std::cout << processed+1 << ": " << eve->time << std::endl;
 
 }
 
 int process_event2(event* eve){
-
 }
 ////////////////////////////////////////////////////////////////
 int main(int argc, char *argv[] )
