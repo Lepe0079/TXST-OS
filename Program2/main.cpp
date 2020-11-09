@@ -56,7 +56,7 @@ void init()
 {
 	// initialize all varilables, states, and end conditions
 	processed = 0;
-	processLimit = 10000;
+	processLimit = 100;
 
 	for(int i = 0; i < processLimit; ++i)
 	{	
@@ -74,6 +74,8 @@ void init()
 void generate_report()
 {
 	// output statistics
+	std::cout << "average turnaround: " << (totalWait/processed) << "\n";
+	std::cout << "throughtput: " << (sClock/processed);
 }
 
 
@@ -205,16 +207,17 @@ int process_event1(){
 	
 	sClock += head->burst;
 
-	if(head->arrival > start)
+	if(head->arrival > finish)
 	{
 		wait = 0;
+		finish = head->burst+head->arrival;
 	}	
 	else
 	{
 		wait = start - head->arrival;
+		finish = start + head->burst;
 	}
 		
-	finish = start + head->burst;
 	start = finish;	
 	totalWait += wait;
 
@@ -241,7 +244,5 @@ int main(int argc, char *argv[] )
 	run_sim();
 	generate_report();
 
-	std::cout << "average turnaround: " << ((totalWait)/processed) << "\n";
-	std::cout << "throughtput: " << (sClock/processed);
 	return 0;
 }
