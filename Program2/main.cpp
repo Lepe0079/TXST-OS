@@ -47,19 +47,26 @@ float sClock; // simulation Eclock
 char **argv; //used to extract arguments from main and use them globally
 int processed, processLimit;
 
+//metrics
+
+float wait, start, turnaround, prevExec;
+
 ////////////////////////////////////////////////////////////////
 void init()
 {
 	// initialize all varilables, states, and end conditions
 	processed = 0;
-	processLimit = 10;
+	processLimit = 100;
 
 	for(int i = 0; i < processLimit; ++i)
 	{	
 		addReady();
 	}
+	scheduleFCFS();
 
-	sClock = 0.0;
+	sClock = 0.0;	
+	prevExec = 0.0;
+	turnaround = 0.0;
 }
 ////////////////////////////////////////////////////////////////
 void generate_report()
@@ -122,6 +129,7 @@ int scheduleFCFS()
 	if(!head)//if there is nothing at the event queue add the ready object to the head
 	{
 		ready = ready->next;
+		temp->next = NULL;
 		head = temp;
 		return 0;
 	}
@@ -130,14 +138,14 @@ int scheduleFCFS()
 		if(cursor->arrival > temp->arrival)
 		{//insert before head
 			ready = ready->next;
-			temp->next = head;
+			temp->next = cursor;
 			head = temp;
 		}
 		else
 		{//search for insert point
-			while(cursor->next && cursor->next->arrival < temp->arrival){
-				cursor = cursor->next;
-			}
+			while(cursor->next && (cursor->next->arrival < temp->arrival))
+			{cursor = cursor->next;}
+			
 			ready = ready->next;
 			temp->next = cursor->next;
 			cursor->next = temp;
@@ -164,13 +172,13 @@ float genexp(float lambda)
 ////////////////////////////////////////////////////////////
 int run_sim()
 {
+	//scheduleFCFS();
 	while (processed < processLimit)//run for 10k events
 	{
 		switch (ARTYPE)
 		{
 			case EVENT1:
 				process_event1();//generate the next event
-				scheduleFCFS();
 				break;
 			case EVENT2:
 				//process_event2();
@@ -190,8 +198,18 @@ int run_sim()
 }
 
 int process_event1(){	
-	std::cout << processed+1 << ": " << head->burst << std::endl;
+	std::cout << processed+1 << ": " << head->burst << std::endl << head->arrival << std::endl;
+	//gather metrics
+	
+	sClock += head->burst;
+	prevExec += head->burst + head->arrival;
+	wait = wait + prevExec - head->burst;
+
+	//go to next event and schedule another
+	garbage = head;	
 	head = head->next;
+	scheduleFCFS();
+	delete garbage;
 }
 
 int process_event2(event* eve){
@@ -209,27 +227,8 @@ int main(int argc, char *argv[] )
 	init();
 	run_sim();
 	generate_report();
+
+	std::cout << "average turnaround: " << ((wait)/processed) << "\n";
+	std::cout << "throughtput: " << (sClock/processed);
 	return 0;
 }
-
-
-/*average turnaround = (completion Time - arrival Time) / processes. where completion time is 
-the current clock time(burst time += burst time)
-
-total throughput = (burst+=burst)/ processes
-
-CPU Utilization = u = required(busy time)/capacity(busy+idle)
-		burst time total/burst time total + context switches(switching between processes)
-
-average number of processes in ready queue n = lambda*average waiting time(0 + burst1... += burst n-1)/processes
-
-event queue holds the events that will be handled by the simulation
-ready queue holds the events that are generated to be added to the event queue
-
-for fcfs ready queue will just insert into event queue by order of arrival
-
-basically ready queue is just the array that holds the generated values
-
-be sure to fulfill this requirement
-Running the simulator with no arguments should display the arguments
-usage.*/
