@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <iostream>
+#include <fstream>
 
 ////////////////////////////////////////////////////////////////
 // sample events
@@ -33,6 +34,7 @@ void generate_report();
 int addReady();
 int schedule_event(struct event** node);
 int scheduleFCFS();
+void logger(std::string);
 int process_event1();
 int process_event2(struct event* eve);
 int process_event3(struct event* eve);
@@ -50,13 +52,14 @@ int processed, processLimit;
 //metrics
 
 float start, finish, wait, totalWait;
+int contextSw;
 
 ////////////////////////////////////////////////////////////////
 void init()
 {
 	// initialize all varilables, states, and end conditions
 	processed = 0;
-	processLimit = 100;
+	processLimit = 10000;
 
 	for(int i = 0; i < processLimit; ++i)
 	{	
@@ -69,13 +72,31 @@ void init()
 	finish = 0.0;
 	wait = 0.0;	
 	totalWait = 0.0;
+	contextSw = 0;
 }
 ////////////////////////////////////////////////////////////////
 void generate_report()
 {
 	// output statistics
-	std::cout << "average turnaround: " << (totalWait/processed) << "\n";
-	std::cout << "throughtput: " << (sClock/processed);
+	std::string log;
+
+	log = "Run #" + std::to_string((int)ARLAMBDA)+ "   Type " +
+			std::to_string(ARTYPE)+ "\n==========================";
+	logger(log);
+	log = "average turnaround: " + std::to_string((totalWait/processed));
+	logger(log);
+
+	log = "throughtput: " + std::to_string((sClock/processed));
+	logger(log);
+	//std::cout << "throughtput: " << (sClock/processed) << "\n";
+
+	log = "CPU Utilization: " + std::to_string((sClock/(sClock+(contextSw*.01)))*100)+ "%";
+	logger(log);
+	//std::cout << "CPU Utilization: " << (sClock/(sClock+(contextSw*.01)))*100 << "%" << "\n";
+	//std::cout << "average number of processes in ready queue: " << (ARLAMBDA*(totalWait/processed));
+	log = "average number of processes in ready queue: " + std::to_string((ARLAMBDA*(totalWait/processed)))+"\n\n";
+	logger(log);
+
 }
 
 
@@ -157,6 +178,19 @@ int scheduleFCFS()
 	}
 	return 0;
 }
+void logger(std::string s)
+{
+    std::cout << s << std::endl;
+    std::ofstream fileOUT;
+    std::ifstream fileIN;
+    fileIN.open("sim.data");
+    fileOUT.open ("sim.data",std::ios::app); // Append mode
+    if (fileIN.is_open()) {
+        fileOUT << s << std::endl; // Writing data to file
+    }
+    fileIN.close();
+    fileOUT.close();
+}
 ////////////////////////////////////////////////////////////////
 // returns a random number between 0 and 1
 float urand(){return( (float) rand()/RAND_MAX );}
@@ -220,6 +254,7 @@ int process_event1(){
 		
 	start = finish;	
 	totalWait += wait;
+	++contextSw;
 
 	//go to next event and schedule another
 	garbage = head;	
@@ -239,6 +274,16 @@ int main(int argc, char *argv[] )
 	// Lambda = argv[2] processes per second
 	// Burst = argv[3]
 	// Quantum = argv[4]
+	for(int i = 0; i < 5; ++i)
+	{
+		if(!argv[i])
+		{
+			std::cout << "please use the programs as follows"
+			<< "\n./sim [type] [lambda] [burst] [quantum]"
+			<< "\neg:{ ./sim 1 30 .06 .1  }";
+			return 0;
+		}
+	}
 
 	init();
 	run_sim();
