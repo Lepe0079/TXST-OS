@@ -49,14 +49,14 @@ int processed, processLimit;
 
 //metrics
 
-float wait, start, turnaround, prevExec;
+float start, finish, wait, totalWait;
 
 ////////////////////////////////////////////////////////////////
 void init()
 {
 	// initialize all varilables, states, and end conditions
 	processed = 0;
-	processLimit = 100;
+	processLimit = 10000;
 
 	for(int i = 0; i < processLimit; ++i)
 	{	
@@ -64,9 +64,11 @@ void init()
 	}
 	scheduleFCFS();
 
-	sClock = 0.0;	
-	prevExec = 0.0;
-	turnaround = 0.0;
+	sClock = 0.0;
+	start = 0.0;
+	finish = 0.0;
+	wait = 0.0;	
+	totalWait = 0.0;
 }
 ////////////////////////////////////////////////////////////////
 void generate_report()
@@ -202,8 +204,19 @@ int process_event1(){
 	//gather metrics
 	
 	sClock += head->burst;
-	prevExec += head->burst + head->arrival;
-	wait = wait + prevExec - head->burst;
+
+	if(head->arrival > start)
+	{
+		wait = 0;
+	}	
+	else
+	{
+		wait = start - head->arrival;
+	}
+		
+	finish = start + head->burst;
+	start = finish;	
+	totalWait += wait;
 
 	//go to next event and schedule another
 	garbage = head;	
@@ -228,7 +241,7 @@ int main(int argc, char *argv[] )
 	run_sim();
 	generate_report();
 
-	std::cout << "average turnaround: " << ((wait)/processed) << "\n";
+	std::cout << "average turnaround: " << ((totalWait)/processed) << "\n";
 	std::cout << "throughtput: " << (sClock/processed);
 	return 0;
 }
