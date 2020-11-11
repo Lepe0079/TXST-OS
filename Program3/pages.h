@@ -4,6 +4,7 @@
 #include<vector>
 #include<deque>
 #include<random>
+#include<iostream>
 
 class pFrame
 {
@@ -16,8 +17,17 @@ class pFrame
     public:
         pFrame();
         pFrame(int, int);
+
         void fillFrame();
+        void displayFrame();
+        bool isEmpty()const;
         int itemCount()const;
+        int getMax()const;
+
+        bool insertAt(int, int);
+        int removeAt(int);
+        bool pushBack(int);
+        bool isHit(int)const;
         int popFront();
 };
 
