@@ -1,0 +1,6 @@
+{
+    "sync.autoUpload": true,
+    "files.associations": {
+        "iostream": "cpp"
+    }
+}

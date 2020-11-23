@@ -23,6 +23,7 @@ class pFrame
         bool isEmpty()const;
         int itemCount()const;
         int getMax()const;
+        int getIndex(int)const;
 
         bool insertAt(int, int);
         int removeAt(int);

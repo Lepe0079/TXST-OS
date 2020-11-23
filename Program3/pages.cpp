@@ -25,6 +25,14 @@ int pFrame::itemCount()const{return frame.size();}
 
 int pFrame::getMax()const{return max;}
 
+int pFrame::getIndex(int search)const{
+    for(int i = 0; i < frame.size(); ++i){
+        if(frame[i] == search)
+            return i;
+    }
+    return -1;
+}
+
 bool pFrame::insertAt(int index, int value){//inserts into index
     frame.at(index) = value;
     return true;
@@ -47,6 +55,7 @@ bool pFrame::isHit(int value)const{//is value found
     }
     return false;
 }
+
 int pFrame::popFront(){//takes the front number off the list
     int temp = frame.front();
     frame.pop_front();
