@@ -32,7 +32,26 @@ int pFrame::getIndex(int search)const{
     }
     return -1;
 }
-
+//returns the index of the number at the back of the reference
+int pFrame::furthestIndex(pFrame* ref)const{
+    int back, curr, index; 
+    for(int i = 0; i < max; ++i){
+        if(!ref->isHit(frame[i]))
+            return i;//short case
+        else if(i == 0){//set the ref
+            back = ref->getIndex(frame[i]);
+            index = 0;
+        }
+        else{//check against the rest
+            curr = ref->getIndex(frame[i]);
+            if(back < curr){//update values
+                back = curr;
+                index = i;
+            }
+        }
+    }
+    return index;
+}
 bool pFrame::insertAt(int index, int value){//inserts into index
     frame.at(index) = value;
     return true;

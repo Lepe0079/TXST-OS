@@ -24,7 +24,7 @@ class pFrame
         int itemCount()const;
         int getMax()const;
         int getIndex(int)const;
-
+        int furthestIndex(pFrame*)const;
         bool insertAt(int, int);
         int removeAt(int);
         bool pushBack(int);
