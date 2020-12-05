@@ -34,7 +34,6 @@ int main(int argc, char* argv[])
    pFrame* pageList = new pFrame(100, seed);
    pFrame* pageCont = new pFrame(frameNum, seed);
    pageList->fillFrame();
-   pageList->displayFrame();
 
    //this is debug code to prove belady's anomaly occurs on FIFO
    //int belady[] = {1, 2, 3, 4, 1, 2, 5, 1, 2, 3, 4, 5};

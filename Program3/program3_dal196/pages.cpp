@@ -13,9 +13,9 @@ void pFrame::fillFrame(){
 }
 
 void pFrame::displayFrame(){//displays the frames
-    std::string s;// = "|";
+    std::string s = "|";
     for(int i = 0; i < frame.size(); ++i){
-        s+= std::to_string(frame[i]) + " ";
+        s+= std::to_string(frame[i]) + "|";
     }
     std::cout << s << std::endl;
 }
